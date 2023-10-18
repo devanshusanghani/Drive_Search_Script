@@ -19,13 +19,19 @@ regex_patterns[email]='[a-zA-Z0-9.-]{2,15}@[a-zA-Z0-9]{1,15}\.[a-zA-Z0-9]{3,4}'
 regex_patterns[ip]='([0-9]{1,3}\.){3}[0-9]{1,3}'
 regex_patterns[username]='^[A-Z][^,]*, [^,]*'
 
+# Check if there are any searchable files in the directory
+if [ $(find . -maxdepth 1 -type f | wc -l) -eq 0 ]; then
+    echo "No searchable files found in the directory."
+    exit 1
+fi
+
 # Perform the search or extraction based on the specified operation type and key information type
 case $operation in
     0) # Search
         if [ "$key_info" == "phone" ]; then
-            grep -P "${regex_patterns[$key_info]}" ./*
+            find . -maxdepth 1 -type f -exec grep -P "${regex_patterns[$key_info]}" {} +
         else
-            grep -E "${regex_patterns[$key_info]}" ./*
+            find . -maxdepth 1 -type f -exec grep -E "${regex_patterns[$key_info]}" {} +
         fi
         ;;
     1) # Extraction
@@ -40,6 +46,5 @@ case $operation in
         exit 1
         ;;
 esac
-
 
 exit 0
